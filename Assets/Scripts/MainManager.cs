@@ -4,6 +4,8 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
+using System.IO; // Save Data
+
 public class MainManager : MonoBehaviour
 {
     public Brick BrickPrefab;
@@ -18,7 +20,54 @@ public class MainManager : MonoBehaviour
     
     private bool m_GameOver = false;
 
-    
+    /// <summary>
+    /// Start of what i added
+    /// </summary>
+    public static MainManager Instance; //save data
+    public Text userName;
+    public Text BestText;
+
+
+    private void Awake()
+    {
+        if (Instance != null)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
+        LoadName();
+    }
+    [System.Serializable]  // Save Data
+    class SaveData
+    {
+        public Text userName;
+    }
+
+    public void SaveName() // Save Data
+    {
+        SaveData data = new SaveData(); // create new instance of save data
+        data.userName = userName;
+
+        string json = JsonUtility.ToJson(data); // convert saved instance into JSON
+        File.WriteAllText(Application.persistentDataPath + "/savefile.json", json);
+    }
+
+    public void LoadName() // Load Data
+    {
+        string path = Application.persistentDataPath + "/savefile.json"; // checks for saved instance
+        if (File.Exists(path))
+        {
+            string json = File.ReadAllText(path); // reads the saved instance
+            SaveData data = JsonUtility.FromJson<SaveData>(json); //transforms JSON back into a saved instance 
+
+            userName = data.userName; //sets userName to the color that was saved 
+        }
+    } /// <summary>
+    /// End of what i added
+    /// </summary>
+
     // Start is called before the first frame update
     void Start()
     {
@@ -72,5 +121,7 @@ public class MainManager : MonoBehaviour
     {
         m_GameOver = true;
         GameOverText.SetActive(true);
+
+        BestText.text = "Best score by " + userName + ": " + m_Points;
     }
 }
