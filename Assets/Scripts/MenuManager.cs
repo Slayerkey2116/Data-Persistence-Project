@@ -13,47 +13,39 @@ using TMPro;
 [DefaultExecutionOrder(1000)]
 public class MenuManager : MonoBehaviour
 {
-    public Text UserName;
+    public static MenuManager Instance;
+    [SerializeField] TMP_InputField UserName;
+    public string playerName;
 
-    public void NewNameSelected(Text text)
-    {
-        // add code here to handle when a color is selected
-
-        MainManager.Instance.userName = text;
-    }
-
+  
     private void Start()
     {
-       /* UserName.Init();
-        //this will call the NewNameSelected function when the color picker have a color button clicked.
-        UserName.onNameChanged += NewNameSelected;
-
-        UserName.SelectName(MainManager.Instance.userName); //pre-select a saved color*/
+       //Added
+       if(DataManager.Instance.currentUser !=" ")
+        {
+            UserName.text = DataManager.Instance.currentUser;
+        }
     }
 
     public void StartNew()
     {
         SceneManager.LoadScene(1);
+        //Added
+        DataManager.Instance.currentUser = UserName.text;
     }
 
     public void Exit() // Conditional compiling, changes functionality based on where the application is running
     {
-        MainManager.Instance.SaveName(); // saves the user's last selected color when the app closes
+       // DataManager.Instance.SaveBest(); // saves the last user when the app closes
 #if UNITY_EDITOR
         EditorApplication.ExitPlaymode();
 #else
         Application.Quit();
 #endif
     }
-
-    public void SaveNameTyped()
+    public void LoadData()
     {
-        MainManager.Instance.SaveName();
-    }
-
-    public void LoadNameTyped()
-    {
-        MainManager.Instance.LoadName();
-        //UserName.SelectName(MainManager.Instance.userName);
+        DataManager.Instance.LoadBest();
+       // BestUser.SelectName(DataManager.Instance.userName);
     }
 }
